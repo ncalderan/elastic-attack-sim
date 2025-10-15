@@ -30,7 +30,7 @@ SETUP
    PUT _index_template/ds-windows-template
    {
      "index_patterns": [
-       "logs-windows.security-*",
+       "logs-system.security-*",
        "logs-windows.powershell-*",
        "logs-windows.sysmon_operational-*",
        "logs-endpoint.events.process-*",
@@ -42,7 +42,7 @@ SETUP
      "priority": 700
    }
 
-   PUT _data_stream/logs-windows.security-simulation
+   PUT _data_stream/logs-system.security-simulation
    PUT _data_stream/logs-windows.powershell-simulation
    PUT _data_stream/logs-windows.sysmon_operational-simulation
    PUT _data_stream/logs-endpoint.events.process-simulation
@@ -118,7 +118,7 @@ AWS_TARGET_USER = "compromised-admin"    # target of CreateAccessKey
 
 # Data sets (Elastic Agent)
 DS = {
-    "win_sec": "windows.security",
+    "win_sec": "system.security",
     "win_ps": "windows.powershell",
     "win_sysmon": "windows.sysmon_operational",
     "ep_proc": "endpoint.events.process",
@@ -127,7 +127,7 @@ DS = {
     "panw": "panw.panos",
 }
 
-TIMELINE_HOURS = 2
+TIMELINE_HOURS = 1
 
 # Example encoded/compressed markers for 4104 rules:
 COMPRESSED_B64_MARKER = "[System.IO.Compression.GzipStream]"
@@ -568,9 +568,9 @@ def main() -> int:
     print(f"Namespace: {args.namespace}")
     print("=" * 66)
     print("\nVALIDATION QUERIES (Discover, last 2h)")
-    print('  • Scheduled Task: data_stream.dataset:"windows.security" AND winlog.event_id:4698 AND event.action:"scheduled-task-created"')
-    print('  • Logs Cleared:   data_stream.dataset:"windows.security" AND winlog.event_id:1102 AND event.action:("audit-log-cleared" or "Log clear")')
-    print('  • PS Args:        (data_stream.dataset:"windows.security" AND winlog.event_id:4688 AND process.command_line:*EncodedCommand*) '
+    print('  • Scheduled Task: data_stream.dataset:"system.security" AND winlog.event_id:4698 AND event.action:"scheduled-task-created"')
+    print('  • Logs Cleared:   data_stream.dataset:"system.security" AND winlog.event_id:1102 AND event.action:("audit-log-cleared" or "Log clear")')
+    print('  • PS Args:        (data_stream.dataset:"system.security" AND winlog.event_id:4688 AND process.command_line:*EncodedCommand*) '
           'OR (data_stream.dataset:"endpoint.events.process" AND process.name:"powershell.exe" AND event.type:"start" AND process.command_line:(*EncodedCommand* OR *DownloadString*))')
     print('  • PS Enc+Comp:    data_stream.dataset:"windows.powershell" AND powershell.file.script_block_text:(FromBase64String AND (GzipStream OR DeflateStream))')
     print('  • PS PE in SB:    data_stream.dataset:"windows.powershell" AND powershell.file.script_block_text:"TVqQAAMAAAAEAAAA"')
